@@ -32,6 +32,9 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 lookDirection;
     private float rotAlongGlobalY;
     private float lastRotation;
+    public bool isStopAiming;
+    public Vector3 aimPoint;
+    private float lerpSpeed = 6.66f;
 
     //debug only
     [SerializeField] private TextMeshProUGUI Text_JumpPressed;
@@ -78,23 +81,34 @@ public class PlayerMovement : MonoBehaviour
     private void Aim()
     {
         Ray ray = Camera.main.ScreenPointToRay(aim);
-        if (Physics.Raycast(ray, out var hitInfo, Mathf.Infinity, floorDetectors))
+        if (Physics.Raycast(ray, out var hitPoint, Mathf.Infinity, floorDetectors))
         {
-            lookDirection = hitInfo.point - transform.position;
+            lookDirection = hitPoint.point - transform.position;
             lookDirection.y = 0f;
             lookDirection = lookDirection.normalized;
 
-            rb.transform.forward = Vector3.Slerp(rb.transform.forward, lookDirection, Time.fixedDeltaTime * 10f);
+            rb.transform.forward = Vector3.Slerp(rb.transform.forward, lookDirection, Time.fixedDeltaTime * lerpSpeed);
+
+            if (hitPoint.collider.name != "NearCollider")
+            {
+                isStopAiming = true;
+            }
+            else
+            {
+                isStopAiming = false;
+            }
         }
+
         //-1 right 1 left turnings
         lastRotation = rotAlongGlobalY - transform.eulerAngles.y;
         // hit
 
         Vector3 pointPos = transform.position;
         pointPos.y += 1.7f;
-        Debug.DrawLine(pointPos, hitInfo.point, Color.red);
+        Debug.DrawLine(pointPos, hitPoint.point, Color.red);
 
         rotAlongGlobalY = transform.eulerAngles.y;
+        aimPoint = hitPoint.point;
     }
 
     private void Move(Vector2 move)
