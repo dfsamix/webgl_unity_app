@@ -1,6 +1,4 @@
-using JetBrains.Annotations;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
